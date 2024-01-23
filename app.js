@@ -1,19 +1,14 @@
 const express = require('express');
 const app = express();
 
-// Middleware para obter o endereço IP do usuário
-app.use((req, res, next) => {
-  const ip = req.headers['x-forwarded-for'] || req.headers['X-Real-IP'] || req.connection.remoteAddress;
-  req.userIP = ip; // Armazena o endereço IP no objeto de solicitação para uso posterior
-  next();
-});
-
-// Rota de exemplo que exibe o endereço IP do usuário
 app.get('/', (req, res) => {
-  const userIP = req.userIP;
-  res.send(`Seu endereço IP é: ${userIP}`);
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  // Verifique se o IP está no formato IPv6 e pegue apenas a parte IPv4
+  const ipv4 = ip.includes(':') ? ip.split(':').pop() : ip;
+  res.send(`Seu endereço IPv4 é: ${ipv4}`);
 });
 
-app.listen(3000, () => {
-  console.log('Servidor em execução na porta 3000');
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Servidor está rodando na porta ${port}`);
 });
